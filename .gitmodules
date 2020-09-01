@@ -1,0 +1,5 @@
+[submodule "rust/libmpecdsa"]
+	path = rust/libmpecdsa
+	url = https://github.com/tronprotocol/multi-party-ecdsa
+	branch = cross-chain
+    ignore=dirty
