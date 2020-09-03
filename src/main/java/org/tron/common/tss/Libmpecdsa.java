@@ -21,9 +21,8 @@ class Libmpecdsa {
         ciphertextsLength);
   }
 
-  public String libmpecdsaKeygenRound3(long ctx, String ciphertexts, int[] ciphertextiLength,
-      int[] resultLength) {
-    return INSTANCE.libmpecdsaKeygenRound3(ctx, ciphertexts, ciphertextiLength, resultLength);
+  public String libmpecdsaKeygenRound3(long ctx, String ciphertexts, int[] ciphertextiLength) {
+    return INSTANCE.libmpecdsaKeygenRound3(ctx, ciphertexts, ciphertextiLength);
   }
 
   public String libmpecdsaKeygenRound4(long ctx, String vssSchemes, int[] vssSchemeLength,
@@ -48,7 +47,7 @@ class Libmpecdsa {
         String decoms, int[] decomiLength, int[] ciphertextsLength);
 
     private native String libmpecdsaKeygenRound3(long ctx, String ciphertexts,
-        int[] ciphertextiLength, int[] resultLength);
+        int[] ciphertextiLength);
 
     private native String libmpecdsaKeygenRound4(long ctx, String vssSchemes,
         int[] vssSchemeLength, int[] resultLength);

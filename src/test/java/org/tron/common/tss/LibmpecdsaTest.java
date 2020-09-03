@@ -62,23 +62,18 @@ public class LibmpecdsaTest {
       //---------------Round3--------------------------------
       System.out.println("--------------round 3--------------------");
       //party 1
-      int[] p1Round3AnsLen = new int[N - 1];
-      String p1Round3Ans = instance.libmpecdsaKeygenRound3(ctx1, p2Round2Ans, p2Round2AnsLen,
-          p1Round3AnsLen);
+      String p1Round3Ans = instance.libmpecdsaKeygenRound3(ctx1, p2Round2Ans, p2Round2AnsLen);
       System.out.println("party1 round3 ans " + p1Round3Ans);
-      Assert.assertTrue(p1Round3Ans.length() == p1Round3AnsLen[0]);
 
       //party 2
-      int[] p2Round3AnsLen = new int[N - 1];
-      String p2Round3Ans = instance.libmpecdsaKeygenRound3(ctx2, p1Round2Ans, p1Round2AnsLen,
-          p2Round3AnsLen);
+      String p2Round3Ans = instance.libmpecdsaKeygenRound3(ctx2, p1Round2Ans, p1Round2AnsLen);
       System.out.println("party2 round3 ans " + p2Round3Ans);
-      Assert.assertTrue(p2Round3Ans.length() == p2Round3AnsLen[0]);
 
       //---------------Round4--------------------------------
       System.out.println("--------------round 4--------------------");
       //party 1
       int[] p1Round4AnsLen = new int[N -1];
+      int[] p2Round3AnsLen = {p2Round3Ans.length()};
       String p1Round4Ans = instance.libmpecdsaKeygenRound4(ctx1, p2Round3Ans, p2Round3AnsLen,
           p1Round4AnsLen);
       System.out.println("party1 round4 ans " + p1Round4Ans);
@@ -86,6 +81,7 @@ public class LibmpecdsaTest {
 
       //party 2
       int[] p2Round4AnsLen = new int[N -1];
+      int[] p1Round3AnsLen = {p1Round3Ans.length()};
       String p2Round4Ans = instance.libmpecdsaKeygenRound4(ctx2, p1Round3Ans, p1Round3AnsLen,
           p2Round4AnsLen);
       System.out.println("party2 round4 ans " + p2Round4Ans);

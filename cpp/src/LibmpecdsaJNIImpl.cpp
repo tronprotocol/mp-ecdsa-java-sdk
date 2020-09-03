@@ -69,16 +69,16 @@ JNIEXPORT jstring JNICALL
         jintArray decom_i_length, jintArray ciphertexts_length) {
 //char *libmpecdsa_keygen_round2(
 //        void *ctx,
-//        char *bcs, // self included
+//        const char *bcs, // self included
 //        const int32_t *bc_i_length, // size = part_total
-//        char *decoms, // self included
+//        const char *decoms, // self included
 //        const int32_t *decom_i_length, // size = party_total
 //        int32_t *ciphertexts_length // size = party_total - 1
 //);
 
-    char *b = (char*) env->GetStringUTFChars(bcs, nullptr);
+    const char *b = (const char*) env->GetStringUTFChars(bcs, nullptr);
     const jint *bl = env->GetIntArrayElements(bc_i_length, nullptr);
-    char *d = (char*) env->GetStringUTFChars(decoms, nullptr);
+    const char *d = (const char*) env->GetStringUTFChars(decoms, nullptr);
     const jint *dl = env->GetIntArrayElements(decom_i_length, nullptr);
     jint *cl =  env->GetIntArrayElements(ciphertexts_length, nullptr);
 
@@ -101,33 +101,29 @@ JNIEXPORT jstring JNICALL
 /*
  * Class:     org_tron_common_tss_Libmpecdsa_LibmpecdsaJNI
  * Method:    libmpecdsaKeygenRound3
- * Signature: (JLjava/lang/String;[I[I)Ljava/lang/String;
+ * Signature: (JLjava/lang/String;[I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
         Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI_libmpecdsaKeygenRound3
-        (JNIEnv * env, jobject, jlong ctx, jstring ciphertexts, jintArray ciphertext_i_length,
-        jintArray result_length) {
+        (JNIEnv * env, jobject, jlong ctx, jstring ciphertexts, jintArray ciphertext_i_length) {
 //    char *libmpecdsa_keygen_round3(
 //            void *ctx,
 //            char *ciphertexts,//exclude self
 //            const int32_t *ciphertext_i_length, //size = party_total - 1
-//            int32_t *result_length //size = 1
 //    );
 
     char *c = (char*) env->GetStringUTFChars(ciphertexts, nullptr);
     const jint *cil = env->GetIntArrayElements(ciphertext_i_length, nullptr);
-    jint *rl = env->GetIntArrayElements(result_length, nullptr);
 
-    if (c == NULL || cil == NULL || rl == NULL) {
+    if (c == NULL || cil == NULL) {
         return NULL;
     }
 
-    char *r = libmpecdsa_keygen_round3((void *)ctx, c, cil, rl);
+    char *r = libmpecdsa_keygen_round3((void *)ctx, c, cil);
     jstring result = env->NewStringUTF(r);
 
     env->ReleaseStringUTFChars(ciphertexts, c);
     env->ReleaseIntArrayElements(ciphertext_i_length, (jint *)cil, 0);
-    env->ReleaseIntArrayElements(result_length, rl, 0);
 
     return result;
 }

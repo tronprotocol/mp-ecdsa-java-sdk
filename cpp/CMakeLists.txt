@@ -68,10 +68,12 @@ ADD_LIBRARY(mpecdsajni
         ${mpecdsa_srcs}
 		)
 
-set(GMP_PATH /usr/local/lib/libgmp.a)
+# GMP
+find_package(GMP REQUIRED)
+include_directories(${GMP_INCLUDE_DIR})
 
 target_link_libraries(mpecdsajni
-        ${GMP_PATH}
+        ${GMP_LIBRARY}
 		${CMAKE_THREAD_LIBS_INIT}
 		${CMAKE_CURRENT_SOURCE_DIR}/../rust/libmpecdsa/libmpecdsa/target/release/libmpecdsa.a
 	)
