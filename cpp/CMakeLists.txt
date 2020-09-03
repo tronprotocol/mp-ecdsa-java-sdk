@@ -43,7 +43,7 @@ add_custom_command(
 
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/rust)
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-		${CMAKE_CURRENT_SOURCE_DIR}/../rust/libmpecdsa/libmpecdsa/target
+		${CMAKE_CURRENT_SOURCE_DIR}/../rust/libmpecdsa/target
 		)
 
 ExternalProject_Add(
@@ -54,7 +54,7 @@ ExternalProject_Add(
 		#		COMMAND cargo build
 		--package libmpecdsa
 		--release
-		BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../rust/libmpecdsa/libmpecdsa"
+		BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../rust/libmpecdsa"
 		INSTALL_COMMAND ""
 		LOG_BUILD ON)
 
@@ -75,7 +75,7 @@ include_directories(${GMP_INCLUDE_DIR})
 target_link_libraries(mpecdsajni
         ${GMP_LIBRARY}
 		${CMAKE_THREAD_LIBS_INIT}
-		${CMAKE_CURRENT_SOURCE_DIR}/../rust/libmpecdsa/libmpecdsa/target/release/libmpecdsa.a
+		${CMAKE_CURRENT_SOURCE_DIR}/../rust/libmpecdsa/target/release/libmpecdsa.a
 	)
 
 add_dependencies(mpecdsajni rust)
