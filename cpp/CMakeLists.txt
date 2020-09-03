@@ -60,7 +60,7 @@ ExternalProject_Add(
 		--release
 		BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../rust/libmpecdsa"
 		INSTALL_COMMAND ""
-		LOG_BUILD ON)
+		LOG_BUILD OFF)
 
 add_custom_target(rust ALL DEPENDS libmpecdsa)
 
