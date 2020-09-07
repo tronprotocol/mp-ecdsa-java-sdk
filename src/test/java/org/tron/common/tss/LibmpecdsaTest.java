@@ -1,5 +1,8 @@
 package org.tron.common.tss;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,7 +12,23 @@ public class LibmpecdsaTest {
 
   @Test
   public void tssTest() {
-    tssImplTest(2, 27, new int[] {1, 0});
+//    tssImplTest(1, 3, new int[] {1, 2});
+    int threshold = 19;
+    int totalNum = 27;
+    int signerNum = 27;
+    int[] signers = new int[signerNum];
+    Set<Integer>  set = new HashSet<>();
+    while (set.size() < signerNum) {
+      int num = (int) (Math.random() * 27);
+      set.add(num);
+    }
+    Iterator<Integer> iter = set.iterator();
+    for (int i = 0; i < signerNum; i++) {
+      if (iter.hasNext()) {
+        signers[i] = iter.next().intValue();
+      }
+    }
+    tssImplTest(threshold, totalNum, signers);
   }
 
   @Test
@@ -283,6 +302,7 @@ public class LibmpecdsaTest {
   }
 
   void tssImplTest(int threshold, int total_number, int[] signers) {
+    System.out.println("totalNum: " + total_number + ", threshold: " + threshold);
     Libmpecdsa instance = LibmpecdsaWrapper.getInstance();
 
     long[] keyCtx = new long[total_number];
@@ -415,6 +435,220 @@ public class LibmpecdsaTest {
       }
 
       //lastly, each party  encrypt and store their result of round5.
+      System.out.println("signer number: " + signers.length);
+      String s = "[ ";
+      for (int i = 0; i < signers.length; i++)
+        s = s + signers[i] + " ";
+      s = s + "]";
+      System.out.println("signers: " + s);
+
+      // sign starts here
+      //-----------------------sign round1--------------------
+      System.out.println("--------------sign round 1--------------------");
+      //signers = {1, 0, 5, 2}
+      int signerNum = signers.length;
+      int[][] commitLength = new int [signerNum][1];
+      int[][] mALength = new int [signerNum][1];
+      String[] signRound1 = new String[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        signRound1[i] = instance
+            .libmpecdsaSignRound1(signCtx[i], round5Ans[signers[i]], signers, signerNum,
+                commitLength[i], mALength[i]);
+        Assert.assertEquals(commitLength[i][0] + mALength[i][0], signRound1[i].length());
+      }
+
+      //-----------------------sign round2--------------------
+      System.out.println("--------------sign round 2--------------------");
+      StringBuffer commitsString = new StringBuffer();
+      StringBuffer mAKString = new StringBuffer();
+      int[] commitsLength = new int [signerNum];
+      int[] mAKLength = new int [signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        commitsString.append(signRound1[i], 0, commitLength[i][0]);
+        mAKString.append(signRound1[i].substring(commitLength[i][0]));
+        commitsLength[i] = commitLength[i][0];
+        mAKLength[i] = mALength[i][0];
+      }
+      String[] signRound2 = new String[signerNum];
+      int[][] mBGammaLength = new int [signerNum][signerNum - 1];
+      int[][] mBWiLength = new int [signerNum][signerNum - 1];
+      for(int i = 0; i < signerNum; i++) {
+        signRound2[i] = instance
+            .libmpecdsaSignRound2(signCtx[i], commitsString.toString(), commitsLength,
+                mAKString.toString(), mAKLength, mBGammaLength[i], mBWiLength[i]);
+        int totalLength = 0;
+        for (int j = 0; j < signerNum - 1; j++) {
+          totalLength += (mBGammaLength[i][j] + mBWiLength[i][j]);
+        }
+        Assert.assertEquals(totalLength, signRound2[i].length());
+      }
+
+      //-----------------------sign round3--------------------
+      System.out.println("--------------sign round 3--------------------");
+      String[][] mBGammaSplit = new String[signerNum][signerNum - 1];
+      String[][] mBWiSplit = new String[signerNum][signerNum - 1];
+      for (int i = 0; i < signerNum; i++) {
+        int m = 0;
+        for (int j = 0; j < signerNum - 1; j++) {
+          mBGammaSplit[i][j] = signRound2[i].substring(m, m + mBGammaLength[i][j]);
+          m = m + mBGammaLength[i][j];
+        }
+        for (int j = 0; j < signerNum -1; j++) {
+          mBWiSplit[i][j] = signRound2[i].substring(m, m + mBWiLength[i][j]);
+          m = m + mBWiLength[i][j];
+        }
+      }
+
+      StringBuffer[] mBGammaStr = new StringBuffer[signerNum];
+      int[][] mBGammasLength = new int[signerNum][signerNum - 1];
+      StringBuffer[] mBWiStr = new StringBuffer[signerNum];
+      int[][] mBWisLength = new int[signerNum][signerNum - 1];
+      for (int i = 0; i < signerNum; i++) {
+        mBGammaStr[i] = new StringBuffer();
+        mBWiStr[i] = new StringBuffer();
+        if (i == 0) {
+          for (int j = 1; j < signerNum; j++) {
+            mBGammaStr[i].append(mBGammaSplit[j][i]);
+            mBWiStr[i].append(mBWiSplit[j][i]);
+            mBGammasLength[i][j - 1] = mBGammaSplit[j][i].length();
+            mBWisLength[i][j - 1] = mBWiSplit[j][i].length();
+          }
+        } else {
+          for (int j = 0; j < signerNum; j++) {
+            if (j != i) {
+              int index = 0;
+              int index2 = 0;
+              if (j < i) {
+                index = i - 1;
+                index2 = j;
+              } else {
+                index = i;
+                index2 = j - 1;
+              }
+              mBGammaStr[i].append(mBGammaSplit[j][index]);
+              mBWiStr[i].append(mBWiSplit[j][index]);
+              mBGammasLength[i][index2] = mBGammaSplit[j][index].length();
+              mBWisLength[i][index2] = mBWiSplit[j][index].length();
+            }
+          }
+        }
+      }
+
+      String[] signRound3 = new String[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        signRound3[i] = instance
+            .libmpecdsaSignRound3(signCtx[i], mBGammaStr[i].toString(), mBGammasLength[i],
+                mBWiStr[i].toString(), mBWisLength[i]);
+      }
+
+      //-----------------------sign round4--------------------
+      System.out.println("--------------sign round 4--------------------");
+      StringBuffer deltaRec = new StringBuffer();
+      int[] deltaLength = new int[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        deltaRec.append(signRound3[i]);
+        deltaLength[i] = signRound3[i].length();
+      }
+      String[] signRound4 = new String[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        signRound4[i] = instance.libmpecdsaSignRound4(signCtx[i], deltaRec.toString(), deltaLength);
+      }
+
+      //-----------------------sign round5--------------------
+      System.out.println("--------------sign round 5--------------------");
+      StringBuffer decommitRec =  new StringBuffer();
+      int[] decommitLength = new int[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        decommitRec.append(signRound4[i]);
+        decommitLength[i] = signRound4[i].length();
+      }
+      int[][] rDashProofLength = new int[signerNum][3];
+      String[] signRound5 = new String[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        signRound5[i] = instance
+            .libmpecdsaSignRound5(signCtx[i], decommitRec.toString(), decommitLength,
+                rDashProofLength[i]);
+        int length = rDashProofLength[i][0] + rDashProofLength[i][1] +rDashProofLength[i][2];
+        Assert.assertEquals(length, signRound5[i].length());
+      }
+
+      //-----------------------sign round6--------------------
+      System.out.println("--------------sign round 6--------------------");
+      StringBuffer rRec = new StringBuffer();
+      int[] rLength = new int[signerNum];
+      StringBuffer rDashRec = new StringBuffer();
+      int[] rDashLength = new int[signerNum];
+      StringBuffer phase5ProofRec = new StringBuffer();
+      int[] phase5ProofLength = new int[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        rRec.append(signRound5[i].substring(0, rDashProofLength[i][0]));
+        rLength[i] = rDashProofLength[i][0];
+        rDashRec.append(signRound5[i]
+            .substring(rDashProofLength[i][0], rDashProofLength[i][0] + rDashProofLength[i][1]));
+        rDashLength[i] = rDashProofLength[i][1];
+        phase5ProofRec.append(signRound5[i].substring(rDashProofLength[i][0] + rDashProofLength[i][1]));
+        phase5ProofLength[i] = rDashProofLength[i][2];
+      }
+      int[][] sProofTLength = new int[signerNum][3];
+      String[] signRound6 = new String[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        signRound6[i] = instance
+            .libmpecdsaSignRound6(signCtx[i], rRec.toString(), rLength, rDashRec.toString(),
+                rDashLength, phase5ProofRec.toString(), phase5ProofLength, sProofTLength[i]);
+        int length = sProofTLength[i][0] + sProofTLength[i][1] + sProofTLength[i][2];
+        Assert.assertEquals(length, signRound6[i].length());
+      }
+
+      //-----------------------sign round7--------------------
+      System.out.println("--------------sign round 7--------------------");
+      StringBuffer sString = new StringBuffer();
+      int[] sLength = new int[signerNum];
+      StringBuffer proofString = new StringBuffer();
+      int[] proofLength = new int[signerNum];
+      StringBuffer tString = new StringBuffer();
+      int[] tLength = new int[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        sString.append(signRound6[i].substring(0, sProofTLength[i][0]));
+        sLength[i] = sProofTLength[i][0];
+        proofString.append(signRound6[i]
+            .substring(sProofTLength[i][0], sProofTLength[i][0] + sProofTLength[i][1]));
+        proofLength[i] = sProofTLength[i][1];
+        tString.append(signRound6[i].substring(sProofTLength[i][0] + sProofTLength[i][1]));
+        tLength[i] = sProofTLength[i][2];
+      }
+
+      String message = "multi-party ecdsa signature";
+      int[][] sigSiLength = new int[signerNum][2];
+      String[] signRound7 = new String[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        signRound7[i] = instance
+            .libmpecdsaSignRound7(signCtx[i], sString.toString(), sLength, proofString.toString(),
+                proofLength, tString.toString(), tLength, message, sigSiLength[i]);
+        Assert.assertEquals(sigSiLength[i][0] + sigSiLength[i][1], signRound7[i].length());
+      }
+
+      //-----------------------sign round8--------------------
+      System.out.println("--------------sign round 8--------------------");
+      StringBuffer sigString = new StringBuffer();
+      int[] sigLength = new int[signerNum];
+      StringBuffer siString = new StringBuffer();
+      int[] siLength = new int[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        sigString.append(signRound7[i].substring(0, sigSiLength[i][0]));
+        sigLength[i] = sigSiLength[i][0];
+        siString.append(signRound7[i].substring(sigSiLength[i][0]));
+        siLength[i] = sigSiLength[i][1];
+      }
+      String[] signRound8 = new String[signerNum];
+      for (int i = 0; i < signerNum; i++) {
+        signRound8[i] = instance
+            .libmpecdsaSignRound8(signCtx[i], sigString.toString(), sigLength, siString.toString(),
+                siLength);
+        Assert.assertEquals(signRound8[0], signRound8[i]);
+      }
+
+
+
 
     } catch (Throwable e) {
       e.printStackTrace();
