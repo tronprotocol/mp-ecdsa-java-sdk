@@ -8,27 +8,32 @@ public class LibmpecdsaTest {
   public static int T = 1; //threshold
 
   @Test
+  public void tssTest() {
+    tssImplTest(2, 27, new int[] {1, 0});
+  }
+
+  @Test
   public void keygenTest() {
     Libmpecdsa instance = LibmpecdsaWrapper.getInstance();
 
     long ctx1 = instance.libmpecdsaKeygenCtxInit(1, N, T);
-    System.out.println("Initialize ctx of party1 " + ctx1);
+    // System.out.println("Initialize ctx of party1 " + ctx1);
     long ctx2 = instance.libmpecdsaKeygenCtxInit(2, N, T);
-    System.out.println("Initialize ctx of party2 " + ctx2);
+    // System.out.println("Initialize ctx of party2 " + ctx2);
 
     long signCtx1 = instance.libmpecdsaSignCtxInit(N, T);
     long signCxt2 = instance.libmpecdsaSignCtxInit(N, T);
 
     boolean testResult = true;
     try {
-      //---------------Round1---------------------------------
-      System.out.println("--------------round 1--------------------");
+      // ---------------Round1---------------------------------
+      System.out.println("--------------keygen round 1--------------------");
       //party 1
       int[] p1BcLength = new int[1];
       int[] p1DecomLength = new int[1];
 
       String p1Round1Ans = instance.libmpecdsaKeygenRound1(ctx1, p1BcLength, p1DecomLength);
-      System.out.println("party1 round1Ans: " + p1Round1Ans);
+      // System.out.println("party1 round1Ans: " + p1Round1Ans);
       Assert.assertTrue(p1Round1Ans.length() == p1DecomLength[0] + p1BcLength[0]);
 
       //party2
@@ -36,11 +41,11 @@ public class LibmpecdsaTest {
       int[] p2DecomLength = new int[1];
 
       String p2Round1Ans = instance.libmpecdsaKeygenRound1(ctx2, p2BcLength, p2DecomLength);
-      System.out.println("party2 round1Ans: " + p1Round1Ans);
+      // System.out.println("party2 round1Ans: " + p1Round1Ans);
       Assert.assertTrue(p2Round1Ans.length() == p2DecomLength[0] + p2BcLength[0]);
 
       //---------------Round2--------------------------------
-      System.out.println("--------------round 2--------------------");
+      System.out.println("--------------keygen round 2--------------------");
       String bcs = p1Round1Ans.substring(0, p1BcLength[0]) + p2Round1Ans.substring(0,
           p2BcLength[0]);
       String decoms = p1Round1Ans.substring(p1BcLength[0]) + p2Round1Ans.substring(p2BcLength[0]);
@@ -52,53 +57,53 @@ public class LibmpecdsaTest {
       int[] p1Round2AnsLen = new int[N - 1];
       String p1Round2Ans = instance.libmpecdsaKeygenRound2(ctx1, bcs, bciLength, decoms,
           decomiLength, p1Round2AnsLen);
-      System.out.println("party1 round2 ans " + p1Round2Ans);
+      // System.out.println("party1 round2 ans " + p1Round2Ans);
       Assert.assertTrue(p1Round2Ans.length() == p1Round2AnsLen[0]);
 
       //party 2
       int[] p2Round2AnsLen = new int[N - 1];
       String p2Round2Ans = instance.libmpecdsaKeygenRound2(ctx2, bcs, bciLength, decoms,
           decomiLength, p2Round2AnsLen);
-      System.out.println("party2 round2 ans " + p2Round2Ans);
+      // System.out.println("party2 round2 ans " + p2Round2Ans);
       Assert.assertTrue(p2Round2Ans.length() == p2Round2AnsLen[0]);
 
       //---------------Round3--------------------------------
-      System.out.println("--------------round 3--------------------");
+      System.out.println("--------------keygen round 3--------------------");
       //party 1
       String p1Round3Ans = instance.libmpecdsaKeygenRound3(ctx1, p2Round2Ans, p2Round2AnsLen);
-      System.out.println("party1 round3 ans " + p1Round3Ans);
+      // System.out.println("party1 round3 ans " + p1Round3Ans);
 
       //party 2
       String p2Round3Ans = instance.libmpecdsaKeygenRound3(ctx2, p1Round2Ans, p1Round2AnsLen);
-      System.out.println("party2 round3 ans " + p2Round3Ans);
+      // System.out.println("party2 round3 ans " + p2Round3Ans);
 
       //---------------Round4--------------------------------
-      System.out.println("--------------round 4--------------------");
+      System.out.println("--------------keygen round 4--------------------");
       //party 1
       int[] p2Round3AnsLen = {p2Round3Ans.length()};
       String p1Round4Ans = instance.libmpecdsaKeygenRound4(ctx1, p2Round3Ans, p2Round3AnsLen);
-      System.out.println("party1 round4 ans " + p1Round4Ans);
+      // System.out.println("party1 round4 ans " + p1Round4Ans);
       Assert.assertTrue(p1Round4Ans.length() > 0);
 
       //party 2
       int[] p1Round3AnsLen = {p1Round3Ans.length()};
       String p2Round4Ans = instance.libmpecdsaKeygenRound4(ctx2, p1Round3Ans, p1Round3AnsLen);
-      System.out.println("party2 round4 ans " + p2Round4Ans);
+      // System.out.println("party2 round4 ans " + p2Round4Ans);
       Assert.assertTrue(p2Round4Ans.length() > 0);
 
       //---------------Round5--------------------------------
-      System.out.println("--------------round 5--------------------");
+      System.out.println("--------------keygen round 5--------------------");
       String dlog_proof = p1Round4Ans + p2Round4Ans;
       int[] dlog_proof_length = {p1Round4Ans.length(), p2Round4Ans.length()};
 
       //party 1
       String p1Round5Ans = instance.libmpecdsaKeygenRound5(ctx1, dlog_proof, dlog_proof_length);
-      System.out.println("party1 round5 ans " + p1Round5Ans);
+      // System.out.println("party1 round5 ans " + p1Round5Ans);
       Assert.assertTrue(p1Round5Ans.length() > 0);
 
       //party 2
       String p2Round5Ans = instance.libmpecdsaKeygenRound5(ctx2, dlog_proof, dlog_proof_length);
-      System.out.println("party2 round5 ans " + p2Round5Ans);
+      // System.out.println("party2 round5 ans " + p2Round5Ans);
       Assert.assertTrue(p2Round5Ans.length() > 0);
 
       //lastly, party1 encrypt and store p1Round5Ans, and so does party2
@@ -273,6 +278,157 @@ public class LibmpecdsaTest {
       instance.libmpecdsaSignCtxFree(signCtx1);
       instance.libmpecdsaSignCtxFree(signCxt2);
       System.out.println("Free ctx successfully.");
+      Assert.assertTrue(testResult);
+    }
+  }
+
+  void tssImplTest(int threshold, int total_number, int[] signers) {
+    Libmpecdsa instance = LibmpecdsaWrapper.getInstance();
+
+    long[] keyCtx = new long[total_number];
+    for (int i = 0; i < total_number; i++) {
+      keyCtx[i] = instance.libmpecdsaKeygenCtxInit(i + 1, total_number, threshold);
+    }
+    long[] signCtx = new long[signers.length];
+    for (int i = 0; i < signers.length; i++) {
+      signCtx[i] = instance.libmpecdsaSignCtxInit(total_number, threshold);
+    }
+
+    boolean testResult = true;
+    try {
+      //---------------Round1---------------------------------
+      System.out.println("--------------keygen round 1--------------------");
+      int[][] bcLength = new int[total_number][1];
+      int[][] decomLength = new int[total_number][1];
+      String[] round1Ans = new String[total_number];
+      for (int i = 0; i < total_number; i++) {
+        round1Ans[i] = instance.libmpecdsaKeygenRound1(keyCtx[i], bcLength[i], decomLength[i]);
+        // System.out.println("party " + (i + 1) + " round1Ans: " + round1Ans[i]);
+        Assert.assertTrue(round1Ans[i].length() == decomLength[i][0] + bcLength[i][0]);
+      }
+
+      //---------------Round2--------------------------------
+      System.out.println("--------------keygen round 2--------------------");
+      String bcs = new String();
+      String decoms = new String();
+      for (int i = 0; i < total_number; i++) {
+        bcs += round1Ans[i].substring(0, bcLength[i][0]);
+        decoms += round1Ans[i].substring(bcLength[i][0]);
+      }
+
+      int[] bciLength = new int[total_number];
+      int[] decomiLength = new int[total_number];
+      for (int i = 0; i < total_number; i++) {
+        bciLength[i] = bcLength[i][0];
+        decomiLength[i] = decomLength[i][0];
+      }
+
+      // for every party
+      int[][] round2AnsLen = new int[total_number][total_number - 1];
+      String[] round2Ans = new String[total_number];
+      for (int i = 0; i < total_number; i++) {
+        round2Ans[i] = instance.libmpecdsaKeygenRound2(keyCtx[i], bcs, bciLength, decoms,
+            decomiLength, round2AnsLen[i]);
+        // System.out.println("party " + (i + 1) + " round2 ans " + round2Ans[i]);
+        int sum = 0;
+        for (int j = 0; j < total_number - 1; j++) {
+          sum += round2AnsLen[i][j];
+        }
+        Assert.assertTrue(round2Ans[i].length() == sum);
+      }
+
+      //round2AnsOrder[i][i] = "";
+      //round2AnsOrder[i][j] = {i -> j}
+      String[][] round2AnsOrder = new String[total_number][total_number];
+      for (int i = 0; i < total_number; i++) {
+        int acc = 0;
+        for (int j = 0; j < total_number; j++) {
+          if (j == i) {
+            continue;
+          }
+          int l = round2AnsLen[i][j < i ? j : j - 1];
+          round2AnsOrder[i][j] = round2Ans[i].substring(acc, acc + l);
+          acc += l;
+        }
+      }
+
+      //---------------Round3--------------------------------
+      System.out.println("--------------keygen round 3--------------------");
+      String[] round3In = new String[total_number];
+      int[][] round3InLen = new int[total_number][total_number - 1];
+      for (int i = 0; i < total_number; i++) {
+        round3In[i] = "";
+        for (int j = 0; j < total_number; j++) {
+          if (j == i) {
+            continue;
+          }
+          round3In[i] += round2AnsOrder[j][i];
+          int index = j < i ? j : j - 1;
+          round3InLen[i][index] = round2AnsOrder[j][i].length();
+        }
+      }
+
+      //for each party
+      String[] round3Ans = new String[total_number];
+      for (int i = 0; i < total_number; i++) {
+        round3Ans[i] = instance.libmpecdsaKeygenRound3(keyCtx[i], round3In[i], round3InLen[i]);
+        // System.out.println("party " + (i + 1) + " round3 ans " + round3Ans[i]);
+      }
+
+      //---------------Round4--------------------------------
+      System.out.println("--------------keygen round 4--------------------");
+      //for each party
+      int[][] round4InLen = new int[total_number][total_number - 1];
+      String[] round4In = new String[total_number];
+      for (int i = 0; i < total_number; i++) {
+        round4In[i] = "";
+        for (int j = 0; j < total_number; j++) {
+          if (j == i) {
+            continue;
+          }
+          round4In[i] += round3Ans[j];
+          int index = j < i ? j : j - 1;
+          round4InLen[i][index] = round3Ans[j].length();
+        }
+      }
+
+      String[] round4Ans = new String[total_number];
+      for (int i = 0; i < total_number; i++) {
+        round4Ans[i] = instance.libmpecdsaKeygenRound4(keyCtx[i], round4In[i], round4InLen[i]);
+        // System.out.println("party " + (i + 1) + " round4 ans " + round4Ans[i]);
+      }
+
+      //---------------Round5--------------------------------
+      System.out.println("--------------keygen round 5--------------------");
+      String dlog_proof = "";
+      int[] dlog_proof_length = new int[total_number];
+      for (int i = 0; i < total_number; i++) {
+        dlog_proof += round4Ans[i];
+        dlog_proof_length[i] = round4Ans[i].length();
+      }
+
+      String[] round5Ans = new String[total_number];
+      //for each party
+      for (int i = 0; i < total_number; i++) {
+        round5Ans[i] = instance.libmpecdsaKeygenRound5(keyCtx[i], dlog_proof, dlog_proof_length);
+        // System.out.println("party " + (i + 1) + " key length " + round5Ans[i].length());
+      }
+
+      //lastly, each party  encrypt and store their result of round5.
+
+    } catch (Throwable e) {
+      e.printStackTrace();
+      testResult = false;
+    } finally {
+      for (int i = 0; i < total_number; i++) {
+        instance.libmpecdsaKeygenCtxFree(keyCtx[i]);
+        // System.out.println("Free keyCtx " + (i + 1) + " successfully.");
+      }
+      for(int i = 0; i < signers.length; i++) {
+        instance.libmpecdsaSignCtxFree(signCtx[i]);
+        // System.out.println("Free signCtx " + (i + 1) + " successfully.");
+      }
+
       Assert.assertTrue(testResult);
     }
   }
