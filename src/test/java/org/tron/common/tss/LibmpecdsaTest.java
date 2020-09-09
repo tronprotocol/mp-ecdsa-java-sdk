@@ -15,7 +15,7 @@ public class LibmpecdsaTest {
 //    tssImplTest(1, 3, new int[] {1, 2});
     int threshold = 19;
     int totalNum = 27;
-    int signerNum = 27;
+    int signerNum = 22;
     int[] signers = new int[signerNum];
     Set<Integer>  set = new HashSet<>();
     while (set.size() < signerNum) {
@@ -580,6 +580,10 @@ public class LibmpecdsaTest {
       int[] rDashLength = new int[signerNum];
       StringBuffer phase5ProofRec = new StringBuffer();
       int[] phase5ProofLength = new int[signerNum];
+      // all r should be equal
+      for (int i = 0; i < signerNum; i++) {
+        Assert.assertEquals(signRound5[0].substring(0, rDashProofLength[0][0]), signRound5[i].substring(0, rDashProofLength[i][0]));
+      }
       for (int i = 0; i < signerNum; i++) {
         rRec.append(signRound5[i].substring(0, rDashProofLength[i][0]));
         rLength[i] = rDashProofLength[i][0];
@@ -644,12 +648,9 @@ public class LibmpecdsaTest {
         signRound8[i] = instance
             .libmpecdsaSignRound8(signCtx[i], sigString.toString(), sigLength, siString.toString(),
                 siLength);
-        Assert.assertEquals(signRound8[0], signRound8[i]);
+        Assert.assertEquals(signRound8[0], signRound8[i]);  // all signatures should be equal
       }
-
-
-
-
+      
     } catch (Throwable e) {
       e.printStackTrace();
       testResult = false;
