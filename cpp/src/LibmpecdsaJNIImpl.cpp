@@ -444,7 +444,7 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
  */
 JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI_libmpecdsaSignRound7
     (JNIEnv * env, jobject, jlong ctx, jstring S_rec, jintArray S_length, jstring homo_proof_rec,
-     jintArray homo_proof_length, jstring T_i_rec, jintArray T_i_length, jstring message,
+     jintArray homo_proof_length, jstring T_i_rec, jintArray T_i_length, jstring message_hash,
      jintArray sig_s_i_length) {
 //char *libmpecdsa_sign_round7(
 //       void *ctx,
@@ -454,7 +454,7 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
 //       const int32_t *homo_proof_length,    //size = signers_num
 //       const char *T_i_rec,                 // size = signers_num
 //       const int32_t *T_i_length,          // size = signers_num
-//       const char *message               // the message to be signed
+//       const char *message               // the 32 bytes message hash to be signed
 //       int32_t *sig_s_i_length,      // size = 2
 
 //);
@@ -464,7 +464,7 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
     const jint *hl = env->GetIntArrayElements(homo_proof_length, nullptr);
     const char *t = (const char*) env->GetStringUTFChars(T_i_rec, nullptr);
     const jint *tl = env->GetIntArrayElements(T_i_length, nullptr);
-    const char *m = (const char*) env->GetStringUTFChars(message, nullptr);
+    const char *m = (const char*) env->GetStringUTFChars(message_hash, nullptr);
     jint *ss = env->GetIntArrayElements(sig_s_i_length, nullptr);
 
     if (s == NULL || sl == NULL || h == NULL || hl == NULL ||
@@ -481,7 +481,7 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
     env->ReleaseIntArrayElements(homo_proof_length, (jint *)hl, 0);
     env->ReleaseStringUTFChars(T_i_rec, t);
     env->ReleaseIntArrayElements(T_i_length, (jint *)tl, 0);
-    env->ReleaseStringUTFChars(message, m);
+    env->ReleaseStringUTFChars(message_hash, m);
     env->ReleaseIntArrayElements(sig_s_i_length, ss, 0);
 
     return result;

@@ -253,16 +253,17 @@ public class LibmpecdsaTest {
       String tString = p2SignRound6.substring(sProofTLength2[0] + sProofTLength2[1]) +
           p1SignRound6.substring(sProofTLength1[0] + sProofTLength1[1]);
       int[] tLength = {sProofTLength2[2], sProofTLength1[2]};
-      String message = "multi-party ecdsa signature";
+      byte[] messageHash = new byte[32];
+      String hashStr = bytesToHexString(messageHash);
 
       int[] sigSiLength1 = new int[2];
       String p1SignRound7 = instance
           .libmpecdsaSignRound7(signCtx1, sString, sLength, proofString, proofLength, tString,
-              tLength, message, sigSiLength1);
+              tLength, hashStr, sigSiLength1);
       int[] sigSiLength2 = new int[2];
       String p2SignRound7 = instance
           .libmpecdsaSignRound7(signCxt2, sString, sLength, proofString, proofLength, tString,
-              tLength, message, sigSiLength2);
+              tLength, hashStr, sigSiLength2);
 
       Assert.assertEquals(sigSiLength1[0] + sigSiLength1[1], p1SignRound7.length());
       Assert.assertEquals(sigSiLength2[0] + sigSiLength2[1], p2SignRound7.length());
@@ -621,13 +622,14 @@ public class LibmpecdsaTest {
         tLength[i] = sProofTLength[i][2];
       }
 
-      String message = "multi-party ecdsa signature";
+      byte[] messageHash = new byte[32];
+      String hashStr = bytesToHexString(messageHash);
       int[][] sigSiLength = new int[signerNum][2];
       String[] signRound7 = new String[signerNum];
       for (int i = 0; i < signerNum; i++) {
         signRound7[i] = instance
             .libmpecdsaSignRound7(signCtx[i], sString.toString(), sLength, proofString.toString(),
-                proofLength, tString.toString(), tLength, message, sigSiLength[i]);
+                proofLength, tString.toString(), tLength, hashStr, sigSiLength[i]);
         Assert.assertEquals(sigSiLength[i][0] + sigSiLength[i][1], signRound7[i].length());
       }
 
@@ -650,7 +652,7 @@ public class LibmpecdsaTest {
                 siLength);
         Assert.assertEquals(signRound8[0], signRound8[i]);  // all signatures should be equal
       }
-      
+
     } catch (Throwable e) {
       e.printStackTrace();
       testResult = false;
@@ -666,5 +668,21 @@ public class LibmpecdsaTest {
 
       Assert.assertTrue(testResult);
     }
+  }
+
+  String bytesToHexString(byte[] src){
+    StringBuilder stringBuilder = new StringBuilder("");
+    if (src == null || src.length <= 0) {
+      return null;
+    }
+    for (int i = 0; i < src.length; i++) {
+      int v = src[i] & 0xFF;
+      String hv = Integer.toHexString(v);
+      if (hv.length() < 2) {
+        stringBuilder.append(0);
+      }
+      stringBuilder.append(hv);
+    }
+    return stringBuilder.toString();
   }
 }
