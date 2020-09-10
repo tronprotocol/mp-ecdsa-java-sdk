@@ -7,41 +7,20 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class LibmpecdsaTest {
-  public static int N = 2; //total participants
-  public static int T = 1; //threshold
 
   @Test
-  public void tssTest() {
-//    tssImplTest(1, 3, new int[] {1, 2});
-    int threshold = 19;
-    int totalNum = 27;
-    int signerNum = 22;
-    int[] signers = new int[signerNum];
-    Set<Integer>  set = new HashSet<>();
-    while (set.size() < signerNum) {
-      int num = (int) (Math.random() * 27);
-      set.add(num);
-    }
-    Iterator<Integer> iter = set.iterator();
-    for (int i = 0; i < signerNum; i++) {
-      if (iter.hasNext()) {
-        signers[i] = iter.next().intValue();
-      }
-    }
-    tssImplTest(threshold, totalNum, signers);
-  }
-
-  @Test
-  public void keygenTest() {
+  public void tss2partyTest() {
+    int n = 2; //total participants
+    int t = 1; //threshold
     Libmpecdsa instance = LibmpecdsaWrapper.getInstance();
 
-    long ctx1 = instance.libmpecdsaKeygenCtxInit(1, N, T);
+    long ctx1 = instance.libmpecdsaKeygenCtxInit(1, n, t);
     // System.out.println("Initialize ctx of party1 " + ctx1);
-    long ctx2 = instance.libmpecdsaKeygenCtxInit(2, N, T);
+    long ctx2 = instance.libmpecdsaKeygenCtxInit(2, n, t);
     // System.out.println("Initialize ctx of party2 " + ctx2);
 
-    long signCtx1 = instance.libmpecdsaSignCtxInit(N, T);
-    long signCxt2 = instance.libmpecdsaSignCtxInit(N, T);
+    long signCtx1 = instance.libmpecdsaSignCtxInit(n, t);
+    long signCxt2 = instance.libmpecdsaSignCtxInit(n, t);
 
     boolean testResult = true;
     try {
@@ -73,14 +52,14 @@ public class LibmpecdsaTest {
       int[] bciLength = {p1BcLength[0], p2BcLength[0]};
       int[] decomiLength = {p1DecomLength[0], p2DecomLength[0]};
       //party 1
-      int[] p1Round2AnsLen = new int[N - 1];
+      int[] p1Round2AnsLen = new int[n - 1];
       String p1Round2Ans = instance.libmpecdsaKeygenRound2(ctx1, bcs, bciLength, decoms,
           decomiLength, p1Round2AnsLen);
       // System.out.println("party1 round2 ans " + p1Round2Ans);
       Assert.assertTrue(p1Round2Ans.length() == p1Round2AnsLen[0]);
 
       //party 2
-      int[] p2Round2AnsLen = new int[N - 1];
+      int[] p2Round2AnsLen = new int[n - 1];
       String p2Round2Ans = instance.libmpecdsaKeygenRound2(ctx2, bcs, bciLength, decoms,
           decomiLength, p2Round2AnsLen);
       // System.out.println("party2 round2 ans " + p2Round2Ans);
@@ -207,7 +186,7 @@ public class LibmpecdsaTest {
       String p2SignRound5 = instance
           .libmpecdsaSignRound5(signCxt2, decommitRec, decommitLength, rDashProofLength2);
       Assert.assertEquals(rDashProofLength1[0] + rDashProofLength1[1] + rDashProofLength1[2],
-           p1SignRound5.length());
+          p1SignRound5.length());
       Assert.assertEquals(rDashProofLength2[0] + rDashProofLength2[1] + rDashProofLength2[2],
           p2SignRound5.length());
       System.out.println("p1SignRound5: " + p1SignRound5);
@@ -235,7 +214,7 @@ public class LibmpecdsaTest {
           .libmpecdsaSignRound6(signCxt2, rRec, rLength, rDashRec, rDashLength,
               phase5ProofRec, phase5ProofLength, sProofTLength2);
       Assert.assertEquals(sProofTLength1[0] + sProofTLength1[1] + sProofTLength1[2],
-           p1SignRound6.length());
+          p1SignRound6.length());
       Assert.assertEquals(sProofTLength2[0] + sProofTLength2[1] + sProofTLength2[2],
           p2SignRound6.length());
       System.out.println("p1SignRound6: " + p1SignRound6);
@@ -300,6 +279,26 @@ public class LibmpecdsaTest {
       System.out.println("Free ctx successfully.");
       Assert.assertTrue(testResult);
     }
+  }
+
+  @Test
+  public void tssTest() {
+    int threshold = 19;
+    int totalNum = 27;
+    int signerNum = 22;
+    int[] signers = new int[signerNum];
+    Set<Integer>  set = new HashSet<>();
+    while (set.size() < signerNum) {
+      int num = (int) (Math.random() * 27);
+      set.add(num);
+    }
+    Iterator<Integer> iter = set.iterator();
+    for (int i = 0; i < signerNum; i++) {
+      if (iter.hasNext()) {
+        signers[i] = iter.next().intValue();
+      }
+    }
+    tssImplTest(threshold, totalNum, signers);
   }
 
   void tssImplTest(int threshold, int total_number, int[] signers) {
