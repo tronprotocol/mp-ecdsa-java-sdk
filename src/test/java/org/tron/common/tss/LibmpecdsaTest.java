@@ -275,7 +275,7 @@ public class LibmpecdsaTest {
           p1SignRound7.substring(0, sigSiLength1[0]);
       int[] sigLength = {sigSiLength2[0], sigSiLength1[0]};
       String siString =
-          p2SignRound7.substring(sigSiLength2[0]) + p1SignRound7.substring(sigSiLength2[0]);
+          p2SignRound7.substring(sigSiLength2[0]) + p1SignRound7.substring(sigSiLength1[0]);
       int[] siLength = {sigSiLength2[1], sigSiLength1[1]};
 
       String p1SignRound8 = instance
@@ -670,7 +670,7 @@ public class LibmpecdsaTest {
     }
   }
 
-  String bytesToHexString(byte[] src){
+  String bytesToHexString(byte[] src) {
     StringBuilder stringBuilder = new StringBuilder("");
     if (src == null || src.length <= 0) {
       return null;
