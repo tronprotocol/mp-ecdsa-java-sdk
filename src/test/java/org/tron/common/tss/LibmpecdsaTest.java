@@ -108,8 +108,8 @@ public class LibmpecdsaTest {
 
       // sign starts here
       //-----------------------sign initialization--------------------
-      System.out.println("Initialize sign ctx of party1 " + signCtx1);
-      System.out.println("Initialize sign ctx of party2 " + signCxt2);
+//      System.out.println("Initialize sign ctx of party1 " + signCtx1);
+//      System.out.println("Initialize sign ctx of party2 " + signCxt2);
 
       //-----------------------sign round1--------------------
       System.out.println("-----------------------sign round1--------------------");
@@ -125,8 +125,8 @@ public class LibmpecdsaTest {
 
       Assert.assertEquals(commit1Length[0] + mA1Length[0], p1SignRound1.length());
       Assert.assertEquals(commit2Length[0] + mA2Length[0], p2SignRound1.length());
-      System.out.println("p1SignRound1" + p1SignRound1);
-      System.out.println("p2SignRound2" + p2SignRound1);
+//      System.out.println("p1SignRound1" + p1SignRound1);
+//      System.out.println("p2SignRound2" + p2SignRound1);
       String commitsString =
           p2SignRound1.substring(0, commit2Length[0]) + p1SignRound1.substring(0, commit1Length[0]);
       String mAKString =
@@ -149,8 +149,8 @@ public class LibmpecdsaTest {
               mBGamma2Length, mBWi2Length);
       Assert.assertEquals(mBGamma1Length[0] + mBWi1Length[0], p1SignRound2.length());
       Assert.assertEquals(mBGamma2Length[0] + mBWi2Length[0], p2SignRound2.length());
-      System.out.println("p1SignRound2: " + p1SignRound2);
-      System.out.println("p2SignRound2: " + p2SignRound2);
+//      System.out.println("p1SignRound2: " + p1SignRound2);
+//      System.out.println("p2SignRound2: " + p2SignRound2);
 
       //-----------------------sign round3--------------------
       System.out.println("-----------------------sign round3--------------------");
@@ -163,8 +163,8 @@ public class LibmpecdsaTest {
       String mBWi2Str = p1SignRound2.substring(mBGamma1Length[0]);
       String p2SignRound3 = instance
           .libmpecdsaSignRound3(signCxt2, mBGamma2Str, mBGamma1Length, mBWi2Str, mBWi1Length);
-      System.out.println("p1SignRound3: " + p1SignRound3);
-      System.out.println("p2SignRound3: " + p2SignRound3);
+//      System.out.println("p1SignRound3: " + p1SignRound3);
+//      System.out.println("p2SignRound3: " + p2SignRound3);
 
       //-----------------------sign round4--------------------
       System.out.println("-----------------------sign round4--------------------");
@@ -172,8 +172,8 @@ public class LibmpecdsaTest {
       int [] deltaLength = {p2SignRound3.length(), p1SignRound3.length()};
       String p1SignRound4 = instance.libmpecdsaSignRound4(signCtx1, deltaRec, deltaLength);
       String p2SignRound4 = instance.libmpecdsaSignRound4(signCxt2, deltaRec, deltaLength);
-      System.out.println("p1SignRound4: " + p1SignRound4);
-      System.out.println("p2SignRound4: " + p2SignRound4);
+//      System.out.println("p1SignRound4: " + p1SignRound4);
+//      System.out.println("p2SignRound4: " + p2SignRound4);
 
       //-----------------------sign round5--------------------
       System.out.println("-----------------------sign round5--------------------");
@@ -189,8 +189,8 @@ public class LibmpecdsaTest {
           p1SignRound5.length());
       Assert.assertEquals(rDashProofLength2[0] + rDashProofLength2[1] + rDashProofLength2[2],
           p2SignRound5.length());
-      System.out.println("p1SignRound5: " + p1SignRound5);
-      System.out.println("p2SignRound5: " + p2SignRound5);
+//      System.out.println("p1SignRound5: " + p1SignRound5);
+//      System.out.println("p2SignRound5: " + p2SignRound5);
 
       //-----------------------sign round6--------------------
       System.out.println("-----------------------sign round6--------------------");
@@ -217,8 +217,8 @@ public class LibmpecdsaTest {
           p1SignRound6.length());
       Assert.assertEquals(sProofTLength2[0] + sProofTLength2[1] + sProofTLength2[2],
           p2SignRound6.length());
-      System.out.println("p1SignRound6: " + p1SignRound6);
-      System.out.println("p2SignRound6: " + p2SignRound6);
+//      System.out.println("p1SignRound6: " + p1SignRound6);
+//      System.out.println("p2SignRound6: " + p2SignRound6);
 
       //-----------------------sign round7--------------------
       System.out.println("-----------------------sign round7--------------------");
@@ -233,39 +233,30 @@ public class LibmpecdsaTest {
           p1SignRound6.substring(sProofTLength1[0] + sProofTLength1[1]);
       int[] tLength = {sProofTLength2[2], sProofTLength1[2]};
       byte[] messageHash = new byte[32];
+      messageHash[31] = 1;
       String hashStr = bytesToHexString(messageHash);
-
-      int[] sigSiLength1 = new int[2];
       String p1SignRound7 = instance
           .libmpecdsaSignRound7(signCtx1, sString, sLength, proofString, proofLength, tString,
-              tLength, hashStr, sigSiLength1);
-      int[] sigSiLength2 = new int[2];
+              tLength, hashStr);
       String p2SignRound7 = instance
           .libmpecdsaSignRound7(signCxt2, sString, sLength, proofString, proofLength, tString,
-              tLength, hashStr, sigSiLength2);
+              tLength, hashStr);
 
-      Assert.assertEquals(sigSiLength1[0] + sigSiLength1[1], p1SignRound7.length());
-      Assert.assertEquals(sigSiLength2[0] + sigSiLength2[1], p2SignRound7.length());
-      System.out.println("p1SignRound7: " + p1SignRound7);
-      System.out.println("p2SignRound7: " + p2SignRound7);
+//      System.out.println("p1SignRound7: " + p1SignRound7);
+//      System.out.println("p2SignRound7: " + p2SignRound7);
       //-----------------------sign round7--------------------
       System.out.println("-----------------------sign round8--------------------");
-      String sigString = p2SignRound7.substring(0, sigSiLength2[0]) +
-          p1SignRound7.substring(0, sigSiLength1[0]);
-      int[] sigLength = {sigSiLength2[0], sigSiLength1[0]};
-      String siString =
-          p2SignRound7.substring(sigSiLength2[0]) + p1SignRound7.substring(sigSiLength1[0]);
-      int[] siLength = {sigSiLength2[1], sigSiLength1[1]};
+      String sigString = p2SignRound7 + p1SignRound7;
+      int[] sigLength = {p2SignRound7.length(), p1SignRound7.length()};
 
       String p1SignRound8 = instance
-          .libmpecdsaSignRound8(signCtx1, sigString, sigLength, siString, siLength);
+          .libmpecdsaSignRound8(signCtx1, sigString, sigLength);
       String p2SignRound8 = instance
-          .libmpecdsaSignRound8(signCxt2, sigString, sigLength, siString, siLength);
+          .libmpecdsaSignRound8(signCxt2, sigString, sigLength);
 
-      System.out.println("p1SignRound8: " + p1SignRound8);
-      System.out.println("p2SignRound8: " + p2SignRound8);
+//      System.out.println("p1SignRound8: " + p1SignRound8);
+//      System.out.println("p2SignRound8: " + p2SignRound8);
       Assert.assertEquals(p1SignRound8, p2SignRound8);
-
 
     } catch (Throwable e) {
       e.printStackTrace();
@@ -622,33 +613,27 @@ public class LibmpecdsaTest {
       }
 
       byte[] messageHash = new byte[32];
+      messageHash[31] = 1;
       String hashStr = bytesToHexString(messageHash);
-      int[][] sigSiLength = new int[signerNum][2];
       String[] signRound7 = new String[signerNum];
       for (int i = 0; i < signerNum; i++) {
         signRound7[i] = instance
             .libmpecdsaSignRound7(signCtx[i], sString.toString(), sLength, proofString.toString(),
-                proofLength, tString.toString(), tLength, hashStr, sigSiLength[i]);
-        Assert.assertEquals(sigSiLength[i][0] + sigSiLength[i][1], signRound7[i].length());
+                proofLength, tString.toString(), tLength, hashStr);
       }
 
       //-----------------------sign round8--------------------
       System.out.println("--------------sign round 8--------------------");
       StringBuffer sigString = new StringBuffer();
       int[] sigLength = new int[signerNum];
-      StringBuffer siString = new StringBuffer();
-      int[] siLength = new int[signerNum];
       for (int i = 0; i < signerNum; i++) {
-        sigString.append(signRound7[i].substring(0, sigSiLength[i][0]));
-        sigLength[i] = sigSiLength[i][0];
-        siString.append(signRound7[i].substring(sigSiLength[i][0]));
-        siLength[i] = sigSiLength[i][1];
+        sigString.append(signRound7[i]);
+        sigLength[i] = signRound7.length;
       }
       String[] signRound8 = new String[signerNum];
       for (int i = 0; i < signerNum; i++) {
         signRound8[i] = instance
-            .libmpecdsaSignRound8(signCtx[i], sigString.toString(), sigLength, siString.toString(),
-                siLength);
+            .libmpecdsaSignRound8(signCtx[i], sigString.toString(), sigLength);
         Assert.assertEquals(signRound8[0], signRound8[i]);  // all signatures should be equal
       }
 

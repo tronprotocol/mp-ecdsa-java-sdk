@@ -77,15 +77,14 @@ class Libmpecdsa {
 
   public String libmpecdsaSignRound7(long ctx, String sRec, int[] sLength,
       String homoProofRec, int[] homoProofLength, String tiRec, int[] tiLength,
-      String messageHash, int[] sigSiLength) {
+      String messageHash) {
     return INSTANCE
         .libmpecdsaSignRound7(ctx, sRec, sLength, homoProofRec, homoProofLength, tiRec, tiLength,
-            messageHash, sigSiLength);
+            messageHash);
   }
 
-  public String libmpecdsaSignRound8(long ctx, String localSigRec, int[] localSigLength,
-      String siRec, int[] siLength) {
-    return INSTANCE.libmpecdsaSignRound8(ctx, localSigRec, localSigLength, siRec, siLength);
+  public String libmpecdsaSignRound8(long ctx, String localSigRec, int[] localSigLength) {
+    return INSTANCE.libmpecdsaSignRound8(ctx, localSigRec, localSigLength);
   }
 
 
@@ -133,10 +132,9 @@ class Libmpecdsa {
 
     private native String libmpecdsaSignRound7(long ctx, String sRec, int[] sLength,
         String homoProofRec, int[] homoProofLength, String tiRec, int[] tiLength,
-        String messageHash, int[] sigSiLength);
+        String messageHash);
 
-    private native String libmpecdsaSignRound8(long ctx, String localSigRec, int[] localSigLength,
-        String siRec, int[] siLength);
+    private native String libmpecdsaSignRound8(long ctx, String localSigRec, int[] localSigLength);
 
   }
 }

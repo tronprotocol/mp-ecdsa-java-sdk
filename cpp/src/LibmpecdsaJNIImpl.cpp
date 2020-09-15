@@ -440,12 +440,11 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
 /*
  * Class:     org_tron_common_tss_Libmpecdsa_LibmpecdsaJNI
  * Method:    libmpecdsaSignRound7
- * Signature: (JLjava/lang/String;[ILjava/lang/String;[ILjava/lang/String;[ILjava/lang/String;[I)Ljava/lang/String;
+ * Signature: (JLjava/lang/String;[ILjava/lang/String;[ILjava/lang/String;[ILjava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI_libmpecdsaSignRound7
     (JNIEnv * env, jobject, jlong ctx, jstring S_rec, jintArray S_length, jstring homo_proof_rec,
-     jintArray homo_proof_length, jstring T_i_rec, jintArray T_i_length, jstring message_hash,
-     jintArray sig_s_i_length) {
+     jintArray homo_proof_length, jstring T_i_rec, jintArray T_i_length, jstring message_hash) {
 //char *libmpecdsa_sign_round7(
 //       void *ctx,
 //       const char *S_rec,           // size = signers_num
@@ -455,8 +454,6 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
 //       const char *T_i_rec,                 // size = signers_num
 //       const int32_t *T_i_length,          // size = signers_num
 //       const char *message               // the 32 bytes message hash to be signed
-//       int32_t *sig_s_i_length,      // size = 2
-
 //);
     const char *s = (const char*) env->GetStringUTFChars(S_rec, nullptr);
     const jint *sl = env->GetIntArrayElements(S_length, nullptr);
@@ -465,14 +462,13 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
     const char *t = (const char*) env->GetStringUTFChars(T_i_rec, nullptr);
     const jint *tl = env->GetIntArrayElements(T_i_length, nullptr);
     const char *m = (const char*) env->GetStringUTFChars(message_hash, nullptr);
-    jint *ss = env->GetIntArrayElements(sig_s_i_length, nullptr);
 
     if (s == NULL || sl == NULL || h == NULL || hl == NULL ||
-        t == NULL || tl == NULL || m == NULL || ss == NULL) {
+        t == NULL || tl == NULL || m == NULL) {
         return NULL;
     }
 
-    char *r = libmpecdsa_sign_round7((void *)ctx, s, sl, h, hl, t, tl, m, ss);
+    char *r = libmpecdsa_sign_round7((void *)ctx, s, sl, h, hl, t, tl, m);
     jstring result = env->NewStringUTF(r);
 
     env->ReleaseStringUTFChars(S_rec, s);
@@ -482,7 +478,6 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
     env->ReleaseStringUTFChars(T_i_rec, t);
     env->ReleaseIntArrayElements(T_i_length, (jint *)tl, 0);
     env->ReleaseStringUTFChars(message_hash, m);
-    env->ReleaseIntArrayElements(sig_s_i_length, ss, 0);
 
     return result;
 }
@@ -490,34 +485,27 @@ JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI
 /*
  * Class:     org_tron_common_tss_Libmpecdsa_LibmpecdsaJNI
  * Method:    libmpecdsaSignRound8
- * Signature: (JLjava/lang/String;[ILjava/lang/String;[I)Ljava/lang/String;
+ * Signature: (JLjava/lang/String;[I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_tron_common_tss_Libmpecdsa_00024LibmpecdsaJNI_libmpecdsaSignRound8
-    (JNIEnv * env, jobject, jlong ctx, jstring local_sig_rec, jintArray local_sig_length,
-    jstring s_i_rec, jintArray s_i_length) {
+    (JNIEnv * env, jobject, jlong ctx, jstring local_sig_rec, jintArray local_sig_length) {
 //char *libmpecdsa_sign_round8(
 //      void *ctx,
 //      const char *local_sig_rec,           // size = signers_num
 //      const int32_t *local_sig_length,     // size = signers_num
-//      const char *s_i_rec,                 //  size = signers_num
-//      const int32_t *s_i_length            // size = signers_num
 //);
     const char *l = (const char*) env->GetStringUTFChars(local_sig_rec, nullptr);
     const jint *ll = env->GetIntArrayElements(local_sig_length, nullptr);
-    const char *s = (const char*) env->GetStringUTFChars(s_i_rec, nullptr);
-    const jint *sl = env->GetIntArrayElements(s_i_length, nullptr);
 
-    if (l == NULL || ll == NULL || s == NULL || sl == NULL) {
+    if (l == NULL || ll == NULL) {
         return NULL;
     }
 
-    char *r = libmpecdsa_sign_round8((void *)ctx, l, ll, s, sl);
+    char *r = libmpecdsa_sign_round8((void *)ctx, l, ll);
     jstring result = env->NewStringUTF(r);
 
     env->ReleaseStringUTFChars(local_sig_rec, l);
     env->ReleaseIntArrayElements(local_sig_length, (jint *)ll, 0);
-    env->ReleaseStringUTFChars(s_i_rec, s);
-    env->ReleaseIntArrayElements(s_i_length, (jint *)sl, 0);
 
     return result;
 }
